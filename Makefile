@@ -2,7 +2,7 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 CURRENT_DIR=$(shell pwd)
-PDB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)?sslmode=disable
+PDB_URL := postgres://$(PDB_USER):$(PDB_PASSWORD)@localhost:$(PDB_PORT)/$(PDB_NAME)?sslmode=disable
 
 proto-gen:
 	./scripts/gen-proto.sh ${CURRENT_DIR}
