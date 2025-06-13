@@ -1,367 +1,88 @@
-definitions:
-  model.ResetPassword:
-    properties:
-      new_password:
-        type: string
-      old_password:
-        type: string
-    type: object
-  model.UpdateUser:
-    properties:
-      address:
-        type: string
-      birth_date:
-        type: string
-      gender:
-        type: string
-      name:
-        type: string
-      phone_number:
-        type: string
-      surname:
-        type: string
-    type: object
-  user.GetUSerByEmailReq:
-    properties:
-      email:
-        type: string
-    type: object
-  user.GetUserResponse:
-    properties:
-      address:
-        type: string
-      birth_date:
-        type: string
-      createdAt:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      phone_number:
-        type: string
-      photo:
-        type: string
-      role:
-        type: string
-      surname:
-        type: string
-    type: object
-  user.LoginReq:
-    properties:
-      email_or_phone_number:
-        type: string
-      password:
-        type: string
-    type: object
-  user.RegisterReq:
-    properties:
-      birth_date:
-        type: string
-      email:
-        type: string
-      gender:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      surname:
-        type: string
-    type: object
-  user.ResetPassReq:
-    properties:
-      code:
-        type: string
-      email:
-        type: string
-      password:
-        type: string
-    type: object
 info:
   contact: {}
 paths:
-  /auth/forgot-password:
+  /test:
     post:
-      description: it send code to your email address
+      consumes:
+      - multipart/form-data
+      description: Register user with individual form fields
       parameters:
-      - description: enough
-        in: body
-        name: token
+      - description: Name
+        example: '"Ali"'
+        in: formData
+        name: name
         required: true
-        schema:
-          $ref: '#/definitions/user.GetUSerByEmailReq'
+        type: string
+      - description: Surname
+        example: '"Valiyev"'
+        in: formData
+        name: surname
+        required: true
+        type: string
+      - description: Email
+        example: '"ali@example.com"'
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Birth Date
+        example: '"1999-01-01"'
+        in: formData
+        name: birth_date
+        required: true
+        type: string
+      - description: Gender
+        enum:
+        - male
+        - female
+        in: formData
+        name: gender
+        required: true
+        type: string
+      - description: Password
+        example: '"password123"'
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: Phone Number
+        example: '"+998901234567"'
+        in: formData
+        name: phone_number
+        required: true
+        type: string
+      - description: Address
+        example: '"Tashkent"'
+        in: formData
+        name: address
+        required: true
+        type: string
+      - description: Role
+        enum:
+        - admin
+        - user
+        in: formData
+        name: role
+        required: true
+        type: string
+      - description: Provider
+        enum:
+        - google
+        - any
+        in: formData
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: message
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      summary: Forgot Password
-      tags:
-      - auth
-  /auth/login:
-    post:
-      description: it generates new access and refresh tokens
-      parameters:
-      - description: username and password
-        in: body
-        name: userinfo
-        required: true
-        schema:
-          $ref: '#/definitions/user.LoginReq'
-      responses:
-        "200":
-          description: Token
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      summary: login user
-      tags:
-      - auth
-  /auth/register:
-    post:
-      description: create new users
-      parameters:
-      - description: User info
-        in: body
-        name: info
-        required: true
-        schema:
-          $ref: '#/definitions/user.RegisterReq'
-      responses:
-        "200":
-          description: Token
-          schema:
-            type: string
-        "400":
-          description: Invalid data
-          schema:
-            type: string
-        "500":
-          description: Server error
+          description: ok
           schema:
             type: string
       summary: Register user
       tags:
       - auth
-  /auth/reset-password:
-    post:
-      description: it Reset your Password
-      parameters:
-      - description: enough
-        in: body
-        name: token
-        required: true
-        schema:
-          $ref: '#/definitions/user.ResetPassReq'
-      responses:
-        "200":
-          description: message
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      summary: Reset Password
-      tags:
-      - auth
-  /auth/user/{id}:
-    get:
-      description: Get User By Id
-      parameters:
-      - description: USER ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.GetUserResponse'
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      summary: Get User By Id
-      tags:
-      - auth
-  /user/change-password:
-    post:
-      description: Update User Profile by token
-      parameters:
-      - description: all
-        in: body
-        name: userinfo
-        required: true
-        schema:
-          $ref: '#/definitions/model.ResetPassword'
-      responses:
-        "200":
-          description: Password changed successfully
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Update User Profile
-      tags:
-      - user
-  /user/delete:
-    delete:
-      description: Api for deleting a user's profile
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: DeleteUserProfile
-      tags:
-      - user
-  /user/photo:
-    delete:
-      description: Api for deleting a user's photo
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: DeleteMediaUser
-      tags:
-      - user
-    post:
-      consumes:
-      - multipart/form-data
-      description: Api for upload a new photo
-      parameters:
-      - description: UploadMediaForm
-        in: formData
-        name: file
-        required: true
-        type: file
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: UploadMediaUser
-      tags:
-      - user
-  /user/profile:
-    get:
-      description: Get User Profile by token
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.GetUserResponse'
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Get User Profile
-      tags:
-      - user
-    put:
-      description: Update User Profile by token
-      parameters:
-      - description: all
-        in: body
-        name: userinfo
-        required: true
-        schema:
-          $ref: '#/definitions/model.UpdateUser'
-      responses:
-        "200":
-          description: User updated successfully
-          schema:
-            type: string
-        "400":
-          description: Invalid date
-          schema:
-            type: string
-        "500":
-          description: error while reading from server
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Update User Profile
-      tags:
-      - user
 securityDefinitions:
   ApiKeyAuth:
     description: API Gateway

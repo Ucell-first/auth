@@ -15,568 +15,117 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/forgot-password": {
+        "/test": {
             "post": {
-                "description": "it send code to your email address",
-                "tags": [
-                    "auth"
+                "description": "Register user with individual form fields",
+                "consumes": [
+                    "multipart/form-data"
                 ],
-                "summary": "Forgot Password",
-                "parameters": [
-                    {
-                        "description": "enough",
-                        "name": "token",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.GetUSerByEmailReq"
-                        }
-                    }
+                "produces": [
+                    "application/json"
                 ],
-                "responses": {
-                    "200": {
-                        "description": "message",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/login": {
-            "post": {
-                "description": "it generates new access and refresh tokens",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "login user",
-                "parameters": [
-                    {
-                        "description": "username and password",
-                        "name": "userinfo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.LoginReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/register": {
-            "post": {
-                "description": "create new users",
                 "tags": [
                     "auth"
                 ],
                 "summary": "Register user",
                 "parameters": [
                     {
-                        "description": "User info",
-                        "name": "info",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.RegisterReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Token",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "type": "string",
+                        "example": "\"Ali\"",
+                        "description": "Name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
                     },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/reset-password": {
-            "post": {
-                "description": "it Reset your Password",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Reset Password",
-                "parameters": [
-                    {
-                        "description": "enough",
-                        "name": "token",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.ResetPassReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "message",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/user/{id}": {
-            "get": {
-                "description": "Get User By Id",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Get User By Id",
-                "parameters": [
                     {
                         "type": "string",
-                        "description": "USER ID",
-                        "name": "id",
-                        "in": "path",
+                        "example": "\"Valiyev\"",
+                        "description": "Surname",
+                        "name": "surname",
+                        "in": "formData",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.GetUserResponse"
-                        }
                     },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/change-password": {
-            "post": {
-                "security": [
                     {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update User Profile by token",
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update User Profile",
-                "parameters": [
-                    {
-                        "description": "all",
-                        "name": "userinfo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.ResetPassword"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Password changed successfully",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "type": "string",
+                        "example": "\"ali@example.com\"",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
                     },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/delete": {
-            "delete": {
-                "security": [
                     {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Api for deleting a user's profile",
-                "tags": [
-                    "user"
-                ],
-                "summary": "DeleteUserProfile",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "type": "string",
+                        "example": "\"1999-01-01\"",
+                        "description": "Birth Date",
+                        "name": "birth_date",
+                        "in": "formData",
+                        "required": true
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
+                    {
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "type": "string",
+                        "description": "Gender",
+                        "name": "gender",
+                        "in": "formData",
+                        "required": true
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/photo": {
-            "post": {
-                "security": [
                     {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Api for upload a new photo",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "UploadMediaUser",
-                "parameters": [
+                        "type": "string",
+                        "example": "\"password123\"",
+                        "description": "Password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
                     {
-                        "type": "file",
-                        "description": "UploadMediaForm",
-                        "name": "file",
+                        "type": "string",
+                        "example": "\"+998901234567\"",
+                        "description": "Phone Number",
+                        "name": "phone_number",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"Tashkent\"",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "admin",
+                            "user"
+                        ],
+                        "type": "string",
+                        "description": "Role",
+                        "name": "role",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "google",
+                            "any"
+                        ],
+                        "type": "string",
+                        "description": "Provider",
+                        "name": "provider",
                         "in": "formData",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "ok",
                         "schema": {
                             "type": "string"
                         }
                     }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Api for deleting a user's photo",
-                "tags": [
-                    "user"
-                ],
-                "summary": "DeleteMediaUser",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/profile": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get User Profile by token",
-                "tags": [
-                    "user"
-                ],
-                "summary": "Get User Profile",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.GetUserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update User Profile by token",
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update User Profile",
-                "parameters": [
-                    {
-                        "description": "all",
-                        "name": "userinfo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.UpdateUser"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User updated successfully",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid date",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "error while reading from server",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "model.ResetPassword": {
-            "type": "object",
-            "properties": {
-                "new_password": {
-                    "type": "string"
-                },
-                "old_password": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.UpdateUser": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "surname": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.GetUSerByEmailReq": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.GetUserResponse": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "photo": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "surname": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.LoginReq": {
-            "type": "object",
-            "properties": {
-                "email_or_phone_number": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.RegisterReq": {
-            "type": "object",
-            "properties": {
-                "birth_date": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "surname": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.ResetPassReq": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
                 }
             }
         }
