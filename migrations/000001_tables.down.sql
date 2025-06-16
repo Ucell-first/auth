@@ -1,3 +1,4 @@
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS refreshtokens;
 DROP TYPE IF EXISTS roles;
 DROP TYPE IF EXISTS providers;

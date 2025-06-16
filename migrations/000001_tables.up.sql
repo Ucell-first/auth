@@ -18,3 +18,11 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at Bigint DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS refreshtokens (
+    token        VARCHAR(500) UNIQUE NOT NULL,
+    user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at   BIGINT DEFAULT 0
+);
