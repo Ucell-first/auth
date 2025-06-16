@@ -34,7 +34,8 @@ type ServerConfig struct {
 }
 
 type TokensConfig struct {
-	TOKEN_KEY string
+	ACCES_TOKEN_KEY   string
+	REFRESH_TOKEN_KEY string
 }
 
 type EmailConfig struct {
@@ -59,7 +60,8 @@ func Load() *Config {
 			USER_ROUTER: cast.ToString(coalesce("USER_ROUTER", ":1234")),
 		},
 		Token: TokensConfig{
-			TOKEN_KEY: cast.ToString(coalesce("TOKEN_KEY", "your_secret_key")),
+			ACCES_TOKEN_KEY:   cast.ToString(coalesce("ACCES_TOKEN_KEY", "your_secret_key1")),
+			REFRESH_TOKEN_KEY: cast.ToString(coalesce("REFRESH_TOKEN_KEY", "your_secret_key2")),
 		},
 		Redis: RedisConfig{
 			RDB_ADDRESS:  cast.ToString(coalesce("RDB_ADDRESS", "localhost:6379")),
