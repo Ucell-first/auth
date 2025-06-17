@@ -1,0 +1,151 @@
+# Updated config for golangci-lint v2.x
+version: 2
+
+run:
+  timeout: 3m
+
+linters-settings:
+  cyclop:
+    max-complexity: 30
+    package-average: 10.0
+
+  errcheck:
+    check-type-assertions: true
+
+  funlen:
+    lines: 100
+    statements: 50
+    ignore-comments: true
+
+  gocognit:
+    min-complexity: 20
+
+  gocritic:
+    settings:
+      captLocal:
+        paramsOnly: false
+      underef:
+        skipRecvDeref: false
+
+  mnd:
+    ignored-functions:
+      - flag.Arg
+      - flag.Duration.*
+      - flag.Float.*
+      - flag.Int.*
+      - flag.Uint.*
+      - os.Chmod
+      - os.Mkdir.*
+      - os.OpenFile
+      - os.WriteFile
+
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+    settings:
+      shadow:
+        strict: true
+
+  nakedret:
+    max-func-lines: 0
+
+  nolintlint:
+    allow-no-explanation: [funlen, gocognit, lll]
+    require-explanation: true
+    require-specific: true
+
+  # Bu yerga gomodguard sozlamalarini qo'shamiz
+  gomodguard:
+    blocked:
+      modules:
+        - github.com/golang/protobuf:
+            recommendations:
+              - google.golang.org/protobuf
+            reason: "see https://developers.google.com/protocol-buffers/docs/reference/go/faq#modules"
+        - github.com/satori/go.uuid:
+            recommendations:
+              - github.com/google/uuid
+            reason: "satori's package is not maintained"
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
+    - gosec
+    - gocritic
+    - gocognit
+    - cyclop
+    - funlen
+    - gocyclo
+    - nakedret
+    - nolintlint
+    - mnd
+    - dupl
+    - godot
+    - nestif
+    - unconvert
+    - unparam
+    - wastedassign
+    - whitespace
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - durationcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - gochecknoglobals
+    - gochecknoinits
+    - goconst
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - lll
+    - makezero
+    - mirror
+    - musttag
+    - nilerr
+    - nilnil
+    - noctx
+    - nonamedreturns
+    - nosprintfhostport
+    - perfsprint
+    - predeclared
+    - reassign
+    - rowserrcheck
+    - sqlclosecheck
+    - testableexamples
+    - testifylint
+    - testpackage
+    - tparallel
+    - usestdlibvars
+
+issues:
+  max-same-issues: 50
+  
+  exclude-rules:
+    - source: "(noinspection|TODO)"
+      linters: [godot]
+    - source: "//noinspection"
+      linters: [gocritic]
+    - path: "_test\\.go"
+      linters:
+        - bodyclose
+        - dupl
+        - funlen
+        - goconst
+        - gosec
+        - noctx
+        
+  exclude-dirs:
+    - vendor
+    - node_modules
+    - test
+    - generated

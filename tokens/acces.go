@@ -10,7 +10,7 @@ import (
 func GenerateACCESJWTToken(id, role string) (string, error) {
 	conf := config.Load()
 	token := *jwt.New(jwt.SigningMethodHS256)
-	//payload
+	// payload
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = id
 	claims["role"] = role

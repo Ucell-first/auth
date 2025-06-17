@@ -9,6 +9,7 @@ type RegisterUserReq struct {
 	Password    string `json:"password,omitempty" example:"password123"`
 	PhoneNumber string `json:"phone_number,omitempty" example:"+998901234567"`
 	Address     string `json:"address,omitempty" example:"Tashkent"`
+	Provider    string `json:"provider" example:"any" enums:"google,any"`
 }
 
 type UserInfo struct {
@@ -38,4 +39,5 @@ type RegisterAdminReq struct {
 	PhoneNumber string `json:"phone_number,omitempty" example:"+998901234567"`
 	Address     string `json:"address,omitempty" example:"Tashkent"`
 	Role        string `json:"role" example:"admin" enums:"admin,user"`
+	Provider    string `json:"provider" example:"any" enums:"google,any"`
 }

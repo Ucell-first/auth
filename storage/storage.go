@@ -7,9 +7,10 @@ import (
 
 type IStorage interface {
 	User() IUserStorage
-	Close()
+	Close() error
 }
 
 type IUserStorage interface {
 	CreateUser(context.Context, *pb.RegisterUserReq) (*pb.UserInfo, error)
+	CreateAdmin(ctx context.Context, req *pb.RegisterAdminReq) (*pb.UserInfo, error)
 }

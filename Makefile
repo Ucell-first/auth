@@ -42,3 +42,7 @@ git:
 git-merge:
 	git fetch origin; \
 	git merge origin/main
+
+.PHONY: lint
+lint:
+	golangci-lint run

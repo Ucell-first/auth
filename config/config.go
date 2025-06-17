@@ -1,3 +1,4 @@
+// Package config provides configuration loading and management
 package config
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cast"
 )
 
+// Config represents the main application configuration.
 type Config struct {
 	Postgres PostgresConfig
 	Server   ServerConfig
@@ -16,6 +18,7 @@ type Config struct {
 	Email    EmailConfig
 }
 
+// PostgresConfig holds PostgreSQL database configuration.
 type PostgresConfig struct {
 	PDB_NAME     string
 	PDB_PORT     string
@@ -24,25 +27,30 @@ type PostgresConfig struct {
 	PDB_HOST     string
 }
 
+// RedisConfig holds Redis configuration.
 type RedisConfig struct {
 	RDB_ADDRESS  string
 	RDB_PASSWORD string
 }
 
+// ServerConfig holds server-related configuration.
 type ServerConfig struct {
 	USER_ROUTER string
 }
 
+// TokensConfig holds JWT token configuration.
 type TokensConfig struct {
 	ACCES_TOKEN_KEY   string
 	REFRESH_TOKEN_KEY string
 }
 
+// EmailConfig holds email service configuration.
 type EmailConfig struct {
 	SENDER_EMAIL string
 	APP_PASSWORD string
 }
 
+// Load loads configuration from environment variables.
 func Load() *Config {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Printf("error while loading .env file: %v", err)
