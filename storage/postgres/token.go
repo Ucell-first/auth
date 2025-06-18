@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"auth/storage"
+	"auth/storage/repo"
 	"context"
 	"database/sql"
 	"fmt"
@@ -12,7 +12,7 @@ type TokenRepository struct {
 	Db *sql.DB
 }
 
-func NewTokenRepository(db *sql.DB) storage.ITokenStorage {
+func NewTokenRepository(db *sql.DB) repo.ITokenStorage {
 	return &TokenRepository{Db: db}
 }
 
@@ -20,7 +20,7 @@ func (t TokenRepository) CreateToken(ctx context.Context, token, userID string) 
 	query := `
 	INSERT INTO refreshtokens (token, user_id)
 	VALUES ($1, $2)
-	ON CONFLICT (token) DO UPDATE 
+	ON CONFLICT (token) DO UPDATE
 	SET updated_at = CURRENT_TIMESTAMP, deleted_at = 0`
 
 	_, err := t.Db.ExecContext(ctx, query, token, userID)
@@ -32,8 +32,8 @@ func (t TokenRepository) CreateToken(ctx context.Context, token, userID string) 
 
 func (t TokenRepository) GetUserIdFromToken(ctx context.Context, token string) (string, error) {
 	query := `
-	SELECT user_id 
-	FROM refreshtokens 
+	SELECT user_id
+	FROM refreshtokens
 	WHERE token = $1 AND deleted_at = 0`
 
 	var userID string
@@ -49,7 +49,7 @@ func (t TokenRepository) GetUserIdFromToken(ctx context.Context, token string) (
 
 func (t TokenRepository) DeleteToken(ctx context.Context, token string) error {
 	query := `
-	UPDATE refreshtokens 
+	UPDATE refreshtokens
 	SET deleted_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
 	WHERE token = $1`
 
@@ -69,7 +69,7 @@ func (t TokenRepository) DeleteExpiredTokens(ctx context.Context) error {
 	expirationTime := time.Now().AddDate(0, -1, 0)
 
 	query := `
-	UPDATE refreshtokens 
+	UPDATE refreshtokens
 	SET deleted_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
 	WHERE created_at < $1 AND deleted_at = 0`
 
@@ -82,7 +82,7 @@ func (t TokenRepository) DeleteExpiredTokens(ctx context.Context) error {
 
 func (t TokenRepository) DeleteTokenByUserId(ctx context.Context, userID string) error {
 	query := `
-	UPDATE refreshtokens 
+	UPDATE refreshtokens
 	SET deleted_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
 	WHERE user_id = $1 AND deleted_at = 0`
 
@@ -95,8 +95,8 @@ func (t TokenRepository) DeleteTokenByUserId(ctx context.Context, userID string)
 
 func (t TokenRepository) VerifyToken(ctx context.Context, token string) (bool, error) {
 	query := `
-	SELECT COUNT(*) 
-	FROM refreshtokens 
+	SELECT COUNT(*)
+	FROM refreshtokens
 	WHERE token = $1 AND deleted_at = 0 AND created_at > CURRENT_TIMESTAMP - INTERVAL '7 days'`
 
 	var count int
@@ -109,8 +109,8 @@ func (t TokenRepository) VerifyToken(ctx context.Context, token string) (bool, e
 
 func (t TokenRepository) GetTokensByUserID(ctx context.Context, userID string) ([]string, error) {
 	query := `
-	SELECT token 
-	FROM refreshtokens 
+	SELECT token
+	FROM refreshtokens
 	WHERE user_id = $1 AND deleted_at = 0`
 
 	rows, err := t.Db.QueryContext(ctx, query, userID)

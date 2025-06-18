@@ -2,22 +2,11 @@ package postgres
 
 import (
 	"auth/config"
-	"auth/storage"
 	"database/sql"
 	"fmt"
 
 	_ "github.com/lib/pq"
 )
-
-type postgresStorage struct {
-	db *sql.DB
-}
-
-func NewPostgresStorage(db *sql.DB) storage.IStorage {
-	return &postgresStorage{
-		db: db,
-	}
-}
 
 func ConnectionPDb() (*sql.DB, error) {
 	conf := config.Load()
@@ -39,20 +28,4 @@ func ConnectionPDb() (*sql.DB, error) {
 	}
 
 	return db, nil
-}
-
-func (p *postgresStorage) Close() error {
-	err := p.db.Close()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *postgresStorage) User() storage.IUserStorage {
-	return NewUserRepository(p.db)
-}
-
-func (p *postgresStorage) Token() storage.ITokenStorage {
-	return NewTokenRepository(p.db)
 }

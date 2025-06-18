@@ -2,7 +2,7 @@ package postgres
 
 import (
 	pb "auth/model/storage"
-	"auth/storage"
+	"auth/storage/repo"
 	"context"
 	"database/sql"
 	"fmt"
@@ -17,7 +17,7 @@ type UserRepository struct {
 	Db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) storage.IUserStorage {
+func NewUserRepository(db *sql.DB) repo.IUserStorage {
 	return &UserRepository{Db: db}
 }
 

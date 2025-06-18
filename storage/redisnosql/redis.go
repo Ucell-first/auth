@@ -1,4 +1,4 @@
-package redis
+package redisnosql
 
 import (
 	"auth/config"
@@ -10,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func ConnectDB() *redis.Client {
+func ConnectRDB() *redis.Client {
 	conf := config.Load()
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     conf.Redis.RDB_ADDRESS,
@@ -20,10 +20,16 @@ func ConnectDB() *redis.Client {
 	return rdb
 }
 
-func StoreCodes(ctx context.Context, code, email string) error {
-	rdb := ConnectDB()
+type RedisRepository struct {
+	Rdb *redis.Client
+}
 
-	err := rdb.Set(ctx, email, code, 10*time.Minute).Err()
+func NewRedisRepository(rdb *redis.Client) *RedisRepository {
+	return &RedisRepository{Rdb: rdb}
+}
+
+func (s RedisRepository) StoreCodes(ctx context.Context, code, email string) error {
+	err := s.Rdb.Set(ctx, email, code, 10*time.Minute).Err()
 	if err != nil {
 		return errors.Wrap(err, "failed to set code in Redis")
 	}
@@ -31,9 +37,8 @@ func StoreCodes(ctx context.Context, code, email string) error {
 	return nil
 }
 
-func GetCodes(ctx context.Context, email string) (string, error) {
-	rdb := ConnectDB()
-	code, err := rdb.Get(ctx, email).Result()
+func (s RedisRepository) GetCodes(ctx context.Context, email string) (string, error) {
+	code, err := s.Rdb.Get(ctx, email).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return "", fmt.Errorf("no code found for email: %s", email)

@@ -1,35 +1,56 @@
 package storage
 
 import (
-	pb "auth/model/storage"
-	"context"
+	"auth/storage/postgres"
+	"auth/storage/redisnosql"
+	"auth/storage/repo"
+	"database/sql"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type IStorage interface {
-	User() IUserStorage
-	Token() ITokenStorage
-	Close() error
+	User() repo.IUserStorage
+	Token() repo.ITokenStorage
+	ClosePDB() error
 }
 
-type IUserStorage interface {
-	CreateUser(context.Context, *pb.RegisterUserReq) (*pb.UserInfo, error)
-	CreateAdmin(ctx context.Context, req *pb.RegisterAdminReq) (*pb.UserInfo, error)
-	Login(ctx context.Context, email, password string) (*pb.UserInfo, error)
-	GetUserByEmail(ctx context.Context, email string) (*pb.UserInfo, error)
-	GetUserById(ctx context.Context, id string) (*pb.UserInfo, error)
-	UserList(ctx context.Context, filter pb.UserFilter, page int64, limit int64) ([]*pb.UserInfo, int64, error)
-	UpdatePassword(ctx context.Context, email, newPassword string) error
-	UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.UserInfo, error)
-	DeleteUser(ctx context.Context, id string) error
-	IsUserExist(ctx context.Context, email, phoneNumber string) (bool, error)
+type databaseStorage struct {
+	db  *sql.DB
+	rdb *redis.Client
 }
 
-type ITokenStorage interface {
-	CreateToken(ctx context.Context, token, userID string) error
-	GetUserIdFromToken(ctx context.Context, token string) (string, error)
-	DeleteToken(ctx context.Context, token string) error
-	DeleteExpiredTokens(ctx context.Context) error
-	DeleteTokenByUserId(ctx context.Context, userID string) error
-	VerifyToken(ctx context.Context, token string) (bool, error)
-	GetTokensByUserID(ctx context.Context, userID string) ([]string, error)
+func NewStorage(db *sql.DB, rdb *redis.Client) IStorage {
+	return &databaseStorage{
+		db:  db,
+		rdb: rdb,
+	}
+}
+
+func (p *databaseStorage) ClosePDB() error {
+	err := p.db.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *databaseStorage) CloseRDB() error {
+	err := p.rdb.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *databaseStorage) User() repo.IUserStorage {
+	return postgres.NewUserRepository(p.db)
+}
+
+func (p *databaseStorage) Token() repo.ITokenStorage {
+	return postgres.NewTokenRepository(p.db)
+}
+
+func (p *databaseStorage) Redis() repo.IRedisStorage {
+	return redisnosql.NewRedisRepository(p.rdb)
 }
