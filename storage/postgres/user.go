@@ -38,27 +38,27 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterUserReq)
 
 	query := `
 	INSERT INTO users (
-		name, 
-		surname, 
-		email, 
-		birth_date, 
-		gender, 
-		password_hash, 
-		phone_number, 
+		name,
+		surname,
+		email,
+		birth_date,
+		gender,
+		password_hash,
+		phone_number,
 		address,
 		provider
 	)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	RETURNING 
-		id, 
-		name, 
-		surname, 
-		email, 
-		birth_date, 
-		gender, 
-		phone_number, 
-		address, 
-		role, 
+	RETURNING
+		id,
+		name,
+		surname,
+		email,
+		birth_date,
+		gender,
+		phone_number,
+		address,
+		role,
 		provider,
 		created_at,
 		updated_at,
@@ -126,28 +126,28 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 
 	query := `
 	INSERT INTO users (
-		name, 
-		surname, 
-		email, 
-		birth_date, 
-		gender, 
-		password_hash, 
-		phone_number, 
+		name,
+		surname,
+		email,
+		birth_date,
+		gender,
+		password_hash,
+		phone_number,
 		address,
 		role,
 		provider
 	)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-	RETURNING 
-		id, 
-		name, 
-		surname, 
-		email, 
-		birth_date, 
-		gender, 
-		phone_number, 
-		address, 
-		role, 
+	RETURNING
+		id,
+		name,
+		surname,
+		email,
+		birth_date,
+		gender,
+		phone_number,
+		address,
+		role,
 		provider,
 		created_at,
 		updated_at,
@@ -197,5 +197,3 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 
 	return &user, nil
 }
-
-// just test
