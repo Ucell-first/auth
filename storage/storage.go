@@ -7,6 +7,7 @@ import (
 
 type IStorage interface {
 	User() IUserStorage
+	Token() ITokenStorage
 	Close() error
 }
 
@@ -21,4 +22,14 @@ type IUserStorage interface {
 	UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.UserInfo, error)
 	DeleteUser(ctx context.Context, id string) error
 	IsUserExist(ctx context.Context, email, phoneNumber string) (bool, error)
+}
+
+type ITokenStorage interface {
+	CreateToken(ctx context.Context, token, userID string) error
+	GetUserIdFromToken(ctx context.Context, token string) (string, error)
+	DeleteToken(ctx context.Context, token string) error
+	DeleteExpiredTokens(ctx context.Context) error
+	DeleteTokenByUserId(ctx context.Context, userID string) error
+	VerifyToken(ctx context.Context, token string) (bool, error)
+	GetTokensByUserID(ctx context.Context, userID string) ([]string, error)
 }

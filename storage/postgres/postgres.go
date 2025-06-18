@@ -19,7 +19,7 @@ func NewPostgresStorage(db *sql.DB) storage.IStorage {
 	}
 }
 
-func ConnectionDb() (*sql.DB, error) {
+func ConnectionPDb() (*sql.DB, error) {
 	conf := config.Load()
 	conDb := fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
@@ -51,4 +51,8 @@ func (p *postgresStorage) Close() error {
 
 func (p *postgresStorage) User() storage.IUserStorage {
 	return NewUserRepository(p.db)
+}
+
+func (p *postgresStorage) Token() storage.ITokenStorage {
+	return NewTokenRepository(p.db)
 }
