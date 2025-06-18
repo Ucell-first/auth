@@ -197,3 +197,5 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 
 	return &user, nil
 }
+
+// just test
