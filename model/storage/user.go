@@ -41,3 +41,14 @@ type RegisterAdminReq struct {
 	Role        string `json:"role" example:"admin" enums:"admin,user"`
 	Provider    string `json:"provider" example:"any" enums:"google,any"`
 }
+
+type UserFilter struct {
+	Name     *string
+	Surname  *string
+	Email    *string
+	Gender   *string
+	Role     *string
+	Provider *string
+	Phone    *string
+	Address  *string
+}
