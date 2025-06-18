@@ -4,11 +4,8 @@ import (
 	"auth/api"
 	"auth/api/handler"
 	"auth/config"
-	"database/sql"
 	"log"
 )
-
-var Db *sql.DB
 
 func main() {
 	hand := NewHandler()

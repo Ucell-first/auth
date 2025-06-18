@@ -44,14 +44,14 @@ func ExtractClaimACCESToken(tokenStr string) (*jwt.MapClaims, error) {
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-	if !(ok && token.Valid) {
+	if !ok || !token.Valid {
 		return nil, err
 	}
 
 	return &claims, nil
 }
 
-func GetUserInfoFromACCESToken(req string) (Id string, Role string, err error) {
+func GetUserInfoFromACCESToken(req string) (id string, role string, err error) {
 	conf := config.Load()
 	Token, err := jwt.Parse(req, func(token *jwt.Token) (interface{}, error) { return []byte(conf.Token.REFRESH_TOKEN_KEY), nil })
 	if err != nil || !Token.Valid {
@@ -61,8 +61,8 @@ func GetUserInfoFromACCESToken(req string) (Id string, Role string, err error) {
 	if !ok {
 		return "", "", err
 	}
-	Id = claims["user_id"].(string)
-	Role = claims["role"].(string)
+	id = claims["user_id"].(string)
+	role = claims["role"].(string)
 
-	return Id, Role, nil
+	return id, role, nil
 }
