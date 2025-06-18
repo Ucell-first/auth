@@ -13,6 +13,7 @@ type IStorage interface {
 	User() repo.IUserStorage
 	Token() repo.ITokenStorage
 	ClosePDB() error
+	CloseRDB() error
 }
 
 type databaseStorage struct {
