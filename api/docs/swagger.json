@@ -1,0 +1,140 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "description": "Yangi foydalanuvchi yaratish va JWT tokenlarini qaytarish",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Foydalanuvchini ro'yxatdan o'tkazish",
+                "parameters": [
+                    {
+                        "description": "Foydalanuvchi ma'lumotlari",
+                        "name": "info",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RegisterUserReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Muvaffaqiyatli ro'yxatdan o'tish",
+                        "schema": {
+                            "$ref": "#/definitions/api.Tokens"
+                        }
+                    },
+                    "400": {
+                        "description": "Noto'g'ri so'rov formati",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Email yoki parol noto'g'ri",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Email allaqachon mavjud",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server ichki xatosi",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.RegisterUserReq": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Tashkent"
+                },
+                "birth_date": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "ali@example.com"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ],
+                    "example": "male"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Ali"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password123"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+998901234567"
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Valiyev"
+                }
+            }
+        },
+        "api.Tokens": {
+            "type": "object",
+            "properties": {
+                "acces_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "API Gateway",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

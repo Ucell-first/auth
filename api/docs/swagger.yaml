@@ -1,0 +1,94 @@
+definitions:
+  api.RegisterUserReq:
+    properties:
+      address:
+        example: Tashkent
+        type: string
+      birth_date:
+        example: "1999-01-01"
+        type: string
+      email:
+        example: ali@example.com
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      name:
+        example: Ali
+        type: string
+      password:
+        example: password123
+        type: string
+      phone_number:
+        example: "+998901234567"
+        type: string
+      surname:
+        example: Valiyev
+        type: string
+    type: object
+  api.Tokens:
+    properties:
+      acces_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Yangi foydalanuvchi yaratish va JWT tokenlarini qaytarish
+      parameters:
+      - description: Foydalanuvchi ma'lumotlari
+        in: body
+        name: info
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Muvaffaqiyatli ro'yxatdan o'tish
+          schema:
+            $ref: '#/definitions/api.Tokens'
+        "400":
+          description: Noto'g'ri so'rov formati
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Email yoki parol noto'g'ri
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Email allaqachon mavjud
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server ichki xatosi
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Foydalanuvchini ro'yxatdan o'tkazish
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    description: API Gateway
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
