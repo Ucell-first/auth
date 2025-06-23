@@ -53,7 +53,7 @@ func ExtractClaimACCESToken(tokenStr string) (*jwt.MapClaims, error) {
 
 func GetUserInfoFromACCESToken(req string) (id string, role string, err error) {
 	conf := config.Load()
-	Token, err := jwt.Parse(req, func(token *jwt.Token) (interface{}, error) { return []byte(conf.Token.REFRESH_TOKEN_KEY), nil })
+	Token, err := jwt.Parse(req, func(token *jwt.Token) (interface{}, error) { return []byte(conf.Token.ACCES_TOKEN_KEY), nil })
 	if err != nil || !Token.Valid {
 		return "", "", err
 	}

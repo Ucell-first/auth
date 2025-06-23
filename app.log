@@ -7,3 +7,40 @@ time=2025-06-23T13:07:37.407+05:00 level=INFO msg="Token cleanup completed" dura
 time=2025-06-23T13:08:24.903+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
 time=2025-06-23T13:08:24.903+05:00 level=INFO msg="Starting token cleanup"
 time=2025-06-23T13:08:24.907+05:00 level=INFO msg="Token cleanup completed" duration=3.797833ms duration_ms=3
+time=2025-06-23T13:45:27.218+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:45:27.219+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:45:27.234+05:00 level=INFO msg="Token cleanup completed" duration=14.973208ms duration_ms=14
+time=2025-06-23T13:45:40.770+05:00 level=INFO msg="Login jarayoni boshlandi"
+time=2025-06-23T13:45:40.797+05:00 level=INFO msg="Muvaffaqiyatli login: admin@gmail.com"
+time=2025-06-23T13:46:14.848+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:46:14.848+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:46:32.350+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:46:32.351+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:48:38.144+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:48:38.144+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:48:38.155+05:00 level=INFO msg="Token cleanup completed" duration=11.08675ms duration_ms=11
+time=2025-06-23T13:48:40.467+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:48:40.467+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:50:24.113+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:50:24.113+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:50:24.617+05:00 level=INFO msg="Token cleanup completed" duration=503.5425ms duration_ms=503
+time=2025-06-23T13:50:28.062+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:50:28.062+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:50:28.879+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:50:28.879+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:50:29.423+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:50:29.423+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:50:29.618+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:50:29.618+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:50:29.826+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:50:29.826+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:51:07.315+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:51:07.315+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:51:07.323+05:00 level=INFO msg="Token cleanup completed" duration=7.681416ms duration_ms=7
+time=2025-06-23T13:51:09.256+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:51:09.256+05:00 level=ERROR msg="Unauthorized: signature is invalid"
+time=2025-06-23T13:51:52.181+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:51:52.182+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:51:52.188+05:00 level=INFO msg="Token cleanup completed" duration=6.075708ms duration_ms=6
+time=2025-06-23T13:51:54.208+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:51:54.209+05:00 level=ERROR msg="Unauthorized1: signature is invalid"
