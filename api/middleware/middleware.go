@@ -10,61 +10,89 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CasbinPermission interface {
-	GetRole(*gin.Context) (string, int)
-	CheckPermission(*gin.Context) (bool, error)
-	CheckPermissionMiddleware() gin.HandlerFunc
-}
-
 type casbinPermission struct {
 	enforcer *casbin.Enforcer
 }
 
-func NewCasbinPermission(enforcer *casbin.Enforcer) CasbinPermission {
-	return &casbinPermission{enforcer: enforcer}
-}
+func Check(crud storage.IStorage) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		accces := c.GetHeader("Authorization")
+		if accces == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Authorization is required",
+			})
+			return
+		}
 
-func Check(c *gin.Context, crud storage.IStorage) {
-	accces := c.GetHeader("Authorization")
-	if accces == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "Authorization is required",
-		})
-		return
+		_, err := tokens.ValidateACCESToken(accces)
+		if err != nil {
+			err = crud.Token().DeleteAccessToken(c, accces)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error": "Internal server error while deleting acces token",
+				})
+				return
+			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid token provided",
+			})
+			return
+		}
+
+		refresh, err := crud.Token().GetRefreshTokenByAccesstoken(c, accces)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Refresh token is expired or deleted",
+			})
+			return
+		}
+
+		_, err = tokens.ValidateRefreshToken(refresh)
+		if err != nil {
+			err = crud.Token().DeleteRefreshTokenAndRelatedAccessTokens(c, refresh)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error": "Internal server error while deleting refresh token",
+				})
+				return
+			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid token provided",
+			})
+			return
+		}
+
+		bl, err := crud.Token().VerifyToken(c, refresh)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": "Internal server error",
+			})
+			return
+		}
+
+		if !bl {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid or expired refresh token",
+			})
+			return
+		}
+
+		exists, err := crud.Token().VerifyAccessToken(c, accces)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Internal server error",
+			})
+			return
+		}
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid or expired access token",
+			})
+			return
+		}
+
+		c.Next()
 	}
-
-	refresh, err := crud.Token().GetRefreshTokenByAccesstoken(c, accces)
-
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "Token didn't find",
-		})
-		return
-	}
-
-	bl, err := crud.Token().VerifyToken(c, refresh)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
-		})
-		return
-	}
-
-	if !bl {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid or expired token",
-		})
-		return
-	}
-
-	_, err = tokens.ValidateACCESToken(accces)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid token provided",
-		})
-		return
-	}
-	c.Next()
 }
 
 func (casb *casbinPermission) GetRole(c *gin.Context) (string, int) {
@@ -100,9 +128,13 @@ func (casb *casbinPermission) CheckPermission(c *gin.Context) (bool, error) {
 	return ok, nil
 }
 
-func (casb *casbinPermission) CheckPermissionMiddleware() gin.HandlerFunc {
+func CheckPermissionMiddleware(enf *casbin.Enforcer) gin.HandlerFunc {
+	casbHandler := &casbinPermission{
+		enforcer: enf,
+	}
+
 	return func(c *gin.Context) {
-		result, err := casb.CheckPermission(c)
+		result, err := casbHandler.CheckPermission(c)
 
 		if err != nil {
 			c.AbortWithError(500, err)

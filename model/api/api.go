@@ -40,3 +40,15 @@ type UserListResponse struct {
 	Page  int64               `json:"page"`
 	Limit int64               `json:"limit"`
 }
+
+type RegisterAdminReq struct {
+	Name        string `json:"name" example:"Admin"`
+	Surname     string `json:"surname" example:"Adminov"`
+	Email       string `json:"email" example:"admin@example.com"`
+	BirthDate   string `json:"birth_date,omitempty" example:"1990-01-01"`
+	Gender      string `json:"gender,omitempty" example:"male" enums:"male,female,non-binary,other"`
+	Password    string `json:"password" example:"securePassword123"`
+	PhoneNumber string `json:"phone_number,omitempty" example:"+998901234567"`
+	Address     string `json:"address,omitempty" example:"Tashkent"`
+	Role        string `json:"role" example:"admin" enums:"admin,user"`
+}

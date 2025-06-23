@@ -31,6 +31,7 @@ type ITokenStorage interface {
 	DeleteAccessToken(ctx context.Context, token string) error
 	DeleteRefreshTokenAndRelatedAccessTokens(ctx context.Context, refreshToken string) error
 	DeleteAllTokensForUser(ctx context.Context, userID string) error
+	VerifyAccessToken(ctx context.Context, accessToken string) (bool, error)
 }
 
 type IRedisStorage interface {

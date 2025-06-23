@@ -351,3 +351,17 @@ func (t TokenRepository) DeleteAllTokensForUser(ctx context.Context, userID stri
 
 	return nil
 }
+
+func (t TokenRepository) VerifyAccessToken(ctx context.Context, accessToken string) (bool, error) {
+	query := `
+	SELECT COUNT(*)
+	FROM accestokens
+	WHERE token = $1 AND deleted_at = 0`
+
+	var count int
+	err := t.Db.QueryRowContext(ctx, query, accessToken).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to verify access token: %w", err)
+	}
+	return count > 0, nil
+}

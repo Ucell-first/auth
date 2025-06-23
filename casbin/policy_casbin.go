@@ -51,7 +51,8 @@ func CasbinEnforcer(logger *slog.Logger) (*casbin.Enforcer, error) {
 	}
 
 	policies := [][]string{
-		{"consumer", "/cards", "POST"},
+		{"admin", "/admin/register", "POST"},
+		{"admin", "/admin/users", "GET"},
 	}
 
 	_, err = enforcer.AddPolicies(policies)

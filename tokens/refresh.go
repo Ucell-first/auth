@@ -2,14 +2,12 @@ package tokens
 
 import (
 	"auth/config"
-	"auth/storage"
-	"context"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-func GenerateRefreshJWTToken(id, role string, crud storage.IStorage) (string, error) {
+func GenerateRefreshJWTToken(id, role string) (string, error) {
 	conf := config.Load()
 	token := *jwt.New(jwt.SigningMethodHS256)
 	// payload
@@ -23,12 +21,6 @@ func GenerateRefreshJWTToken(id, role string, crud storage.IStorage) (string, er
 	if err != nil {
 		return "", err
 	}
-
-	err = crud.Token().CreateToken(context.Background(), newToken, id)
-	if err != nil {
-		return "", err
-	}
-
 	return newToken, nil
 }
 

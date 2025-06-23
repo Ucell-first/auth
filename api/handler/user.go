@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -79,10 +80,25 @@ func (h Handler) Register(c *gin.Context) {
 		return
 	}
 
-	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role, h.Cruds)
+	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role)
 	if err != nil {
 		h.Log.Error(fmt.Sprintf("error on generating refresh token: %v", err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generatsiya qilishda xato"})
+		return
+	}
+
+	if err := h.Cruds.Token().CreateToken(c, refresh, res.ID); err != nil {
+		h.Log.Error("Failed to create refresh token", "error", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
+		return
+	}
+
+	if err := h.Cruds.Token().CreateAccessToken(c, access, refresh); err != nil {
+		h.Log.Error("Failed to create access token", "error", err)
+		if delErr := h.Cruds.Token().DeleteToken(c, refresh); delErr != nil {
+			h.Log.Error("Failed to clean up refresh token after access token creation failure", "error", delErr)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		return
 	}
 
@@ -138,12 +154,31 @@ func (h Handler) Login(c *gin.Context) {
 		return
 	}
 
-	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role, h.Cruds)
+	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role)
 	if err != nil {
 		h.Log.Error("Refresh token generatsiya qilishda xato: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generatsiya qilishda xato"})
 		return
 	}
+
+	if err := h.Cruds.Token().CreateToken(c, refresh, res.ID); err != nil {
+		h.Log.Error("Failed to create refresh token", "error", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
+		return
+	}
+
+	if err := h.Cruds.Token().CreateAccessToken(c, access, refresh); err != nil {
+		h.Log.Error("Failed to create access token", "error", err)
+
+		if delErr := h.Cruds.Token().DeleteToken(c, refresh); delErr != nil {
+			h.Log.Error("Failed to clean up refresh token after access token creation failure", "error", delErr)
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
+		return
+	}
+
+	// ... keyingi kod ...
 
 	h.Log.Info("Muvaffaqiyatli login: " + res.Email)
 	c.JSON(http.StatusOK, &pb.Tokens{
@@ -488,8 +523,81 @@ func (h *Handler) DeleteUserProfile(c *gin.Context) {
 		return
 	}
 
+	if err := h.Cruds.Token().DeleteAllTokensForUser(c, userID); err != nil {
+		h.Log.Warn("Failed to delete user tokens", "user_id", userID, "error", err)
+	}
+
 	h.Log.Info("User profile deleted: " + userID)
 	c.JSON(http.StatusOK, gin.H{"message": "user profile deleted"})
+}
+
+// RegisterAdmin godoc
+// @Summary Register a new admin user
+// @Description Create a new admin user (requires admin role)
+// @Tags admin
+// @Security ApiKeyAuth
+// @Param admin body api.RegisterAdminReq true "Admin registration data"
+// @Success 201 {object} storage.UserInfo
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 403 {object} map[string]string "Forbidden"
+// @Failure 409 {object} map[string]string "Email already exists"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /admin/register [post]
+func (h *Handler) RegisterAdmin(c *gin.Context) {
+	h.Log.Info("RegisterAdmin started")
+	var req pb.RegisterAdminReq
+	if err := c.BindJSON(&req); err != nil {
+		h.Log.Error("Invalid request format: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request format"})
+		return
+	}
+
+	if !email.IsValidEmail(req.Email) {
+		h.Log.Error("Invalid email format: " + req.Email)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email format"})
+		return
+	}
+
+	if len(req.Password) < 8 {
+		h.Log.Error("Password too short")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "password must be at least 8 characters"})
+		return
+	}
+
+	admin, err := h.Cruds.User().CreateAdmin(c, &storage.RegisterAdminReq{
+		Name:        req.Name,
+		Surname:     req.Surname,
+		Email:       req.Email,
+		BirthDate:   req.BirthDate,
+		Gender:      req.Gender,
+		Password:    req.Password,
+		PhoneNumber: req.PhoneNumber,
+		Address:     req.Address,
+		Role:        req.Role,
+		Provider:    "any",
+	})
+
+	if err != nil {
+		h.Log.Error("Admin creation error: " + err.Error())
+		if strings.Contains(err.Error(), "unique constraint") {
+			if strings.Contains(err.Error(), "email") {
+				c.JSON(http.StatusConflict, gin.H{"error": "email already exists"})
+				return
+			}
+			if strings.Contains(err.Error(), "phone_number") {
+				c.JSON(http.StatusConflict, gin.H{"error": "phone number already exists"})
+				return
+			}
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create admin"})
+		return
+	}
+	admin.PasswordHash = ""
+
+	h.Log.Info("Admin created successfully: " + admin.Email)
+	c.JSON(http.StatusCreated, admin)
 }
 
 // UserList godoc
