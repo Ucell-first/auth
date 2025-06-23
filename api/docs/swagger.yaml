@@ -15,6 +15,44 @@ definitions:
         example: password123
         type: string
     type: object
+  api.RegisterAdminReq:
+    properties:
+      address:
+        example: Tashkent
+        type: string
+      birth_date:
+        example: "1990-01-01"
+        type: string
+      email:
+        example: admin@example.com
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - non-binary
+        - other
+        example: male
+        type: string
+      name:
+        example: Admin
+        type: string
+      password:
+        example: securePassword123
+        type: string
+      phone_number:
+        example: "+998901234567"
+        type: string
+      role:
+        enum:
+        - admin
+        - user
+        example: admin
+        type: string
+      surname:
+        example: Adminov
+        type: string
+    type: object
   api.RegisterUserReq:
     properties:
       address:
@@ -131,6 +169,56 @@ definitions:
 info:
   contact: {}
 paths:
+  /admin/register:
+    post:
+      description: Create a new admin user (requires admin role)
+      parameters:
+      - description: Admin registration data
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterAdminReq'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/storage.UserInfo'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Email already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Register a new admin user
+      tags:
+      - admin
   /admin/users:
     get:
       description: Get a list of users (requires admin role)

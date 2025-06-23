@@ -15,6 +15,84 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/register": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new admin user (requires admin role)",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Register a new admin user",
+                "parameters": [
+                    {
+                        "description": "Admin registration data",
+                        "name": "admin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RegisterAdminReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/storage.UserInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Email already exists",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admin/users": {
             "get": {
                 "security": [
@@ -658,6 +736,57 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "example": "password123"
+                }
+            }
+        },
+        "api.RegisterAdminReq": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Tashkent"
+                },
+                "birth_date": {
+                    "type": "string",
+                    "example": "1990-01-01"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "admin@example.com"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "non-binary",
+                        "other"
+                    ],
+                    "example": "male"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Admin"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "securePassword123"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+998901234567"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "user"
+                    ],
+                    "example": "admin"
+                },
+                "surname": {
+                    "type": "string",
+                    "example": "Adminov"
                 }
             }
         },
