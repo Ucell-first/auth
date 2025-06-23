@@ -33,9 +33,31 @@ func Check(c *gin.Context, crud storage.IStorage) {
 		return
 	}
 
-	// bl,err:= crud.Token().VerifyToken()
+	refresh, err := crud.Token().GetRefreshTokenByAccesstoken(c, accces)
 
-	_, err := tokens.ValidateACCESToken(accces)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "Token didn't find",
+		})
+		return
+	}
+
+	bl, err := crud.Token().VerifyToken(c, refresh)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error",
+		})
+		return
+	}
+
+	if !bl {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid or expired token",
+		})
+		return
+	}
+
+	_, err = tokens.ValidateACCESToken(accces)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token provided",

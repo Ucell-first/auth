@@ -12,6 +12,7 @@ import (
 type IStorage interface {
 	User() repo.IUserStorage
 	Token() repo.ITokenStorage
+	Redis() repo.IRedisStorage
 	ClosePDB() error
 	CloseRDB() error
 }
