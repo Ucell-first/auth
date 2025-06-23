@@ -27,6 +27,7 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterUserReq)
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
+	// NULL qiymatlarni tayyorlash
 	var birthDate sql.NullTime
 	if req.BirthDate != "" {
 		t, err := time.Parse("2006-01-02", req.BirthDate)
@@ -34,50 +35,55 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterUserReq)
 			return nil, fmt.Errorf("invalid birth_date format: %w", err)
 		}
 		birthDate = sql.NullTime{Time: t, Valid: true}
-	} else {
-		birthDate = sql.NullTime{Valid: false}
 	}
 
+	gender := sql.NullString{String: req.Gender, Valid: req.Gender != ""}
+	phone := sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""}
+	address := sql.NullString{String: req.Address, Valid: req.Address != ""}
+
 	query := `
-	INSERT INTO users (
-		name,
-		surname,
-		email,
-		birth_date,
-		gender,
-		password_hash,
-		phone_number,
-		address,
-		provider
-	)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	RETURNING
-		id,
-		name,
-		surname,
-		email,
-		birth_date,
-		gender,
-		phone_number,
-		address,
-		role,
-		provider,
-		created_at,
-		updated_at,
-		deleted_at`
+    INSERT INTO users (
+        name,
+        surname,
+        email,
+        birth_date,
+        gender,
+        password_hash,
+        phone_number,
+        address,
+        provider
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING
+        id,
+        name,
+        surname,
+        email,
+        birth_date,
+        gender,
+        phone_number,
+        address,
+        role,
+        provider,
+        created_at,
+        updated_at,
+        deleted_at`
 
 	var user pb.UserInfo
-	var dbBirthDate time.Time
+	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err = u.Db.QueryRowContext(ctx, query,
 		req.Name,
 		req.Surname,
 		req.Email,
 		birthDate,
-		req.Gender,
+		gender,
 		string(hashedPassword),
-		sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""},
-		sql.NullString{String: req.Address, Valid: req.Address != ""},
+		phone,
+		address,
 		req.Provider,
 	).Scan(
 		&user.ID,
@@ -85,9 +91,9 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterUserReq)
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbGender,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -99,11 +105,13 @@ func (u UserRepository) CreateUser(ctx context.Context, req *pb.RegisterUserReq)
 		return nil, fmt.Errorf("failed to insert user: %w", err)
 	}
 
-	if birthDate.Valid {
-		user.BirthDate = birthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
+	// NULL qiymatlarni qayta ishlash
+	if dbBirthDate.Valid {
+		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
 	}
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
 	user.PasswordHash = ""
 
 	return &user, nil
@@ -122,51 +130,56 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 			return nil, fmt.Errorf("invalid birth_date format: %w", err)
 		}
 		birthDate = sql.NullTime{Time: t, Valid: true}
-	} else {
-		birthDate = sql.NullTime{Valid: false}
 	}
 
+	gender := sql.NullString{String: req.Gender, Valid: req.Gender != ""}
+	phone := sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""}
+	address := sql.NullString{String: req.Address, Valid: req.Address != ""}
+
 	query := `
-	INSERT INTO users (
-		name,
-		surname,
-		email,
-		birth_date,
-		gender,
-		password_hash,
-		phone_number,
-		address,
-		role,
-		provider
-	)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-	RETURNING
-		id,
-		name,
-		surname,
-		email,
-		birth_date,
-		gender,
-		phone_number,
-		address,
-		role,
-		provider,
-		created_at,
-		updated_at,
-		deleted_at`
+    INSERT INTO users (
+        name,
+        surname,
+        email,
+        birth_date,
+        gender,
+        password_hash,
+        phone_number,
+        address,
+        role,
+        provider
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    RETURNING
+        id,
+        name,
+        surname,
+        email,
+        birth_date,
+        gender,
+        phone_number,
+        address,
+        role,
+        provider,
+        created_at,
+        updated_at,
+        deleted_at`
 
 	var user pb.UserInfo
-	var dbBirthDate time.Time
+	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err = u.Db.QueryRowContext(ctx, query,
 		req.Name,
 		req.Surname,
 		req.Email,
 		birthDate,
-		req.Gender,
+		gender,
 		string(hashedPassword),
-		sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""},
-		sql.NullString{String: req.Address, Valid: req.Address != ""},
+		phone,
+		address,
 		req.Role,
 		req.Provider,
 	).Scan(
@@ -175,9 +188,9 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbGender,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -189,12 +202,12 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 		return nil, fmt.Errorf("failed to insert admin: %w", err)
 	}
 
-	if birthDate.Valid {
-		user.BirthDate = birthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
+	if dbBirthDate.Valid {
+		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
 	}
-
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
 	user.PasswordHash = ""
 
 	return &user, nil
@@ -202,14 +215,17 @@ func (u UserRepository) CreateAdmin(ctx context.Context, req *pb.RegisterAdminRe
 
 func (u UserRepository) Login(ctx context.Context, email, password string) (*pb.UserInfo, error) {
 	query := `
-    SELECT 
-        id, name, surname, email, birth_date, gender, password_hash, 
+    SELECT
+        id, name, surname, email, birth_date, gender, password_hash,
         phone_number, address, role, provider, created_at, updated_at, deleted_at
-    FROM users 
+    FROM users
     WHERE email = $1 AND deleted_at = 0`
 
 	var user pb.UserInfo
 	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err := u.Db.QueryRowContext(ctx, query, email).Scan(
 		&user.ID,
@@ -217,10 +233,10 @@ func (u UserRepository) Login(ctx context.Context, email, password string) (*pb.
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
+		&dbGender,
 		&user.PasswordHash,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -235,16 +251,17 @@ func (u UserRepository) Login(ctx context.Context, email, password string) (*pb.
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
+	// NULL qiymatlarni qayta ishlash
+	if dbBirthDate.Valid {
+		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
+	}
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
+
 	// Parolni tekshirish
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, fmt.Errorf("invalid password")
-	}
-
-	// Tug'ilgan sanani formatlash
-	if dbBirthDate.Valid {
-		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
 	}
 
 	return &user, nil
@@ -252,14 +269,17 @@ func (u UserRepository) Login(ctx context.Context, email, password string) (*pb.
 
 func (u UserRepository) GetUserByEmail(ctx context.Context, email string) (*pb.UserInfo, error) {
 	query := `
-    SELECT 
-        id, name, surname, email, birth_date, gender, 
+    SELECT
+        id, name, surname, email, birth_date, gender,
         phone_number, address, role, provider, created_at, updated_at, deleted_at
-    FROM users 
+    FROM users
     WHERE email = $1 AND deleted_at = 0`
 
 	var user pb.UserInfo
 	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err := u.Db.QueryRowContext(ctx, query, email).Scan(
 		&user.ID,
@@ -267,9 +287,9 @@ func (u UserRepository) GetUserByEmail(ctx context.Context, email string) (*pb.U
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbGender,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -279,30 +299,35 @@ func (u UserRepository) GetUserByEmail(ctx context.Context, email string) (*pb.U
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil // User topilmadi, lekin xato emas
+			return nil, nil
 		}
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
 
+	// NULL qiymatlarni qayta ishlash
 	if dbBirthDate.Valid {
 		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
 	}
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
 
 	return &user, nil
 }
 
 func (u UserRepository) GetUserById(ctx context.Context, id string) (*pb.UserInfo, error) {
 	query := `
-    SELECT 
-        id, name, surname, email, birth_date, gender, 
+    SELECT
+        id, name, surname, email, birth_date, gender,
         phone_number, address, role, provider, created_at, updated_at, deleted_at
-    FROM users 
+    FROM users
     WHERE id = $1 AND deleted_at = 0`
 
 	var user pb.UserInfo
 	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err := u.Db.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
@@ -310,9 +335,9 @@ func (u UserRepository) GetUserById(ctx context.Context, id string) (*pb.UserInf
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbGender,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -327,11 +352,13 @@ func (u UserRepository) GetUserById(ctx context.Context, id string) (*pb.UserInf
 		return nil, fmt.Errorf("failed to get user by id: %w", err)
 	}
 
+	// NULL qiymatlarni qayta ishlash
 	if dbBirthDate.Valid {
 		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
 	}
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
 
 	return &user, nil
 }
@@ -342,17 +369,13 @@ func (u UserRepository) UserList(
 	page int64,
 	limit int64,
 ) ([]*pb.UserInfo, int64, error) {
-	// Asosiy so'rov
 	baseQuery := "FROM users WHERE deleted_at = 0"
-	// Hisoblash so'rovi
 	countQuery := "SELECT COUNT(*) " + baseQuery
 
-	// Filtrlarni qo'shish
 	var args []interface{}
 	conditions := []string{}
 	argCount := 1
 
-	// Har bir filter uchun shart qo'shish
 	if filter.Name != nil {
 		conditions = append(conditions, fmt.Sprintf("name ILIKE $%d", argCount))
 		args = append(args, "%"+*filter.Name+"%")
@@ -394,24 +417,21 @@ func (u UserRepository) UserList(
 		argCount++
 	}
 
-	// Filtr shartlarini birlashtirish
 	if len(conditions) > 0 {
 		whereClause := " AND " + strings.Join(conditions, " AND ")
 		baseQuery += whereClause
 		countQuery += whereClause
 	}
 
-	// Umumiy sonni hisoblash
 	var total int64
 	err := u.Db.QueryRowContext(ctx, countQuery, args...).Scan(&total)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to count users: %w", err)
 	}
 
-	// Ma'lumotlarni olish
 	dataQuery := `
-    SELECT 
-        id, name, surname, email, birth_date, gender, 
+    SELECT
+        id, name, surname, email, birth_date, gender,
         phone_number, address, role, provider, created_at, updated_at, deleted_at
     ` + baseQuery + `
     ORDER BY created_at DESC
@@ -429,6 +449,9 @@ func (u UserRepository) UserList(
 	for rows.Next() {
 		var user pb.UserInfo
 		var dbBirthDate sql.NullTime
+		var dbGender sql.NullString
+		var dbPhone sql.NullString
+		var dbAddress sql.NullString
 
 		err := rows.Scan(
 			&user.ID,
@@ -436,9 +459,9 @@ func (u UserRepository) UserList(
 			&user.Surname,
 			&user.Email,
 			&dbBirthDate,
-			&user.Gender,
-			&user.PhoneNumber,
-			&user.Address,
+			&dbGender,
+			&dbPhone,
+			&dbAddress,
 			&user.Role,
 			&user.Provider,
 			&user.CreatedAt,
@@ -452,9 +475,10 @@ func (u UserRepository) UserList(
 
 		if dbBirthDate.Valid {
 			user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
-		} else {
-			user.BirthDate = ""
 		}
+		user.Gender = dbGender.String
+		user.PhoneNumber = dbPhone.String
+		user.Address = dbAddress.String
 
 		users = append(users, &user)
 	}
@@ -487,7 +511,6 @@ func (u UserRepository) UpdatePassword(ctx context.Context, email, newPassword s
 }
 
 func (u UserRepository) UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.UserInfo, error) {
-	// Sanani formatlash
 	var birthDate sql.NullTime
 	if req.BirthDate != "" {
 		t, err := time.Parse("2006-01-02", req.BirthDate)
@@ -495,9 +518,11 @@ func (u UserRepository) UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.U
 			return nil, fmt.Errorf("invalid birth_date format: %w", err)
 		}
 		birthDate = sql.NullTime{Time: t, Valid: true}
-	} else {
-		birthDate = sql.NullTime{Valid: false}
 	}
+
+	gender := sql.NullString{String: req.Gender, Valid: req.Gender != ""}
+	phone := sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""}
+	address := sql.NullString{String: req.Address, Valid: req.Address != ""}
 
 	query := `
     UPDATE users SET
@@ -512,21 +537,24 @@ func (u UserRepository) UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.U
         provider = $9,
         updated_at = CURRENT_TIMESTAMP
     WHERE id = $10
-    RETURNING 
-        id, name, surname, email, birth_date, gender, 
+    RETURNING
+        id, name, surname, email, birth_date, gender,
         phone_number, address, role, provider, created_at, updated_at, deleted_at`
 
 	var user pb.UserInfo
-	var dbBirthDate time.Time
+	var dbBirthDate sql.NullTime
+	var dbGender sql.NullString
+	var dbPhone sql.NullString
+	var dbAddress sql.NullString
 
 	err := u.Db.QueryRowContext(ctx, query,
 		req.Name,
 		req.Surname,
 		req.Email,
 		birthDate,
-		req.Gender,
-		sql.NullString{String: req.PhoneNumber, Valid: req.PhoneNumber != ""},
-		sql.NullString{String: req.Address, Valid: req.Address != ""},
+		gender,
+		phone,
+		address,
 		req.Role,
 		req.Provider,
 		req.ID,
@@ -536,9 +564,9 @@ func (u UserRepository) UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.U
 		&user.Surname,
 		&user.Email,
 		&dbBirthDate,
-		&user.Gender,
-		&user.PhoneNumber,
-		&user.Address,
+		&dbGender,
+		&dbPhone,
+		&dbAddress,
 		&user.Role,
 		&user.Provider,
 		&user.CreatedAt,
@@ -550,11 +578,12 @@ func (u UserRepository) UpdateUser(ctx context.Context, req *pb.UserInfo) (*pb.U
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
-	if birthDate.Valid {
-		user.BirthDate = birthDate.Time.Format("2006-01-02")
-	} else {
-		user.BirthDate = ""
+	if dbBirthDate.Valid {
+		user.BirthDate = dbBirthDate.Time.Format("2006-01-02")
 	}
+	user.Gender = dbGender.String
+	user.PhoneNumber = dbPhone.String
+	user.Address = dbAddress.String
 
 	return &user, nil
 }
