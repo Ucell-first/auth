@@ -28,6 +28,9 @@ type ITokenStorage interface {
 	GetTokensByUserID(ctx context.Context, userID string) ([]string, error)
 	CreateAccessToken(ctx context.Context, token, refreshToken string) error
 	GetRefreshTokenByAccesstoken(ctx context.Context, accessToken string) (string, error)
+	DeleteAccessToken(ctx context.Context, token string) error
+	DeleteRefreshTokenAndRelatedAccessTokens(ctx context.Context, refreshToken string) error
+	DeleteAllTokensForUser(ctx context.Context, userID string) error
 }
 
 type IRedisStorage interface {

@@ -1,4 +1,20 @@
 definitions:
+  api.ChangePasswordReq:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  api.LoginReq:
+    properties:
+      email:
+        example: ali@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    type: object
   api.RegisterUserReq:
     properties:
       address:
@@ -29,16 +45,240 @@ definitions:
         example: Valiyev
         type: string
     type: object
+  api.ResetPassReq:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      email:
+        example: ali@example.com
+        type: string
+      password:
+        example: newPassword123
+        type: string
+    type: object
   api.Tokens:
     properties:
-      acces_token:
+      access_token:
         type: string
       refresh_token:
+        type: string
+    type: object
+  api.UserListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/storage.UserInfo'
+        type: array
+    type: object
+  storage.UserInfo:
+    properties:
+      address:
+        example: Tashkent
+        type: string
+      birth_date:
+        example: "1999-01-01"
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: integer
+      email:
+        example: ali@example.com
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Ali
+        type: string
+      password_hash:
+        example: password123
+        type: string
+      phone_number:
+        example: "+998901234567"
+        type: string
+      provider:
+        enum:
+        - google
+        - any
+        example: any
+        type: string
+      role:
+        enum:
+        - admin
+        - user
+        example: user
+        type: string
+      surname:
+        example: Valiyev
+        type: string
+      updated_at:
         type: string
     type: object
 info:
   contact: {}
 paths:
+  /admin/users:
+    get:
+      description: Get a list of users (requires admin role)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: List users (admin only)
+      tags:
+      - admin
+  /auth/forgot-password/{email}:
+    post:
+      description: Send password reset code to user's email
+      parameters:
+      - description: USER email
+        in: path
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid email format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Email not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Forgot Password
+      tags:
+      - auth
+  /auth/login:
+    post:
+      description: it generates new access and refresh tokens
+      parameters:
+      - description: username and password
+        in: body
+        name: userinfo
+        required: true
+        schema:
+          $ref: '#/definitions/api.LoginReq'
+      responses:
+        "200":
+          description: Tokenlar
+          schema:
+            $ref: '#/definitions/api.Tokens'
+        "400":
+          description: Noto'g'ri so'rov
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Kirish rad etildi
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Server xatosi
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Invalidate the current session's tokens
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - auth
   /auth/register:
     post:
       consumes:
@@ -85,6 +325,213 @@ paths:
       summary: Foydalanuvchini ro'yxatdan o'tkazish
       tags:
       - auth
+  /auth/reset-password:
+    post:
+      description: Reset user password with verification code
+      parameters:
+      - description: Reset Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.ResetPassReq'
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid or expired code
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reset Password
+      tags:
+      - auth
+  /auth/user/{id}:
+    get:
+      description: Get User By Id
+      parameters:
+      - description: USER ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/storage.UserInfo'
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get User By Id
+      tags:
+      - auth
+  /user/password:
+    put:
+      description: Change the password of the authenticated user
+      parameters:
+      - description: Old and new passwords
+        in: body
+        name: passwords
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChangePasswordReq'
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized or old password incorrect
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password
+      tags:
+      - user
+  /user/profile:
+    delete:
+      description: Delete the profile of the authenticated user (soft delete)
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user profile
+      tags:
+      - user
+    get:
+      description: Get the profile of the authenticated user
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/storage.UserInfo'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get user profile
+      tags:
+      - user
+    put:
+      description: Update the profile of the authenticated user (does not update password)
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/storage.UserInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/storage.UserInfo'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update user profile
+      tags:
+      - user
 securityDefinitions:
   ApiKeyAuth:
     description: API Gateway

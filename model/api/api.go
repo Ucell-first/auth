@@ -1,5 +1,7 @@
 package api
 
+import "auth/model/storage"
+
 type Tokens struct {
 	RefreshToken string `json:"refresh_token,omitempty"`
 	AccessToken  string `json:"access_token,omitempty"`
@@ -25,4 +27,16 @@ type ResetPassReq struct {
 	Email    string `json:"email" example:"ali@example.com"`
 	Password string `json:"password" example:"newPassword123"`
 	Code     string `json:"code" example:"123456"`
+}
+
+type ChangePasswordReq struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+type UserListResponse struct {
+	Users []*storage.UserInfo `json:"users"`
+	Total int64               `json:"total"`
+	Page  int64               `json:"page"`
+	Limit int64               `json:"limit"`
 }
