@@ -77,7 +77,7 @@ func (h Handler) Register(c *gin.Context) {
 		return
 	}
 
-	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role)
+	refresh, err := tokens.GenerateRefreshJWTToken(res.ID, res.Role, h.Cruds)
 	if err != nil {
 		h.Log.Error(fmt.Sprintf("error on generating refresh token: %v", err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generatsiya qilishda xato"})

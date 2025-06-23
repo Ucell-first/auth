@@ -26,3 +26,11 @@ CREATE TABLE IF NOT EXISTS refreshtokens (
     updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at   BIGINT DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS accestokens (
+    token        VARCHAR(500) UNIQUE NOT NULL,
+    refresh_token      VARCHAR(500) NOT NULL REFERENCES refreshtokens(token) ON DELETE CASCADE,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at   BIGINT DEFAULT 0
+);

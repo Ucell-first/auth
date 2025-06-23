@@ -134,3 +134,34 @@ func (t TokenRepository) GetTokensByUserID(ctx context.Context, userID string) (
 
 	return tokens, nil
 }
+
+func (t TokenRepository) CreateAccessToken(ctx context.Context, token, refreshToken string) error {
+	query := `
+	INSERT INTO accestokens (token, refresh_token)
+	VALUES ($1, $2)
+	ON CONFLICT (token) DO UPDATE
+	SET updated_at = CURRENT_TIMESTAMP, deleted_at = 0`
+
+	_, err := t.Db.ExecContext(ctx, query, token, refreshToken)
+	if err != nil {
+		return fmt.Errorf("failed to create access token: %w", err)
+	}
+	return nil
+}
+
+func (t TokenRepository) GetRefreshTokenByAccesstoken(ctx context.Context, accessToken string) (string, error) {
+	query := `
+	SELECT refresh_token
+	FROM accestokens
+	WHERE token = $1 AND deleted_at = 0`
+
+	var refreshToken string
+	err := t.Db.QueryRowContext(ctx, query, accessToken).Scan(&refreshToken)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("access token not found")
+		}
+		return "", fmt.Errorf("failed to get refresh token: %w", err)
+	}
+	return refreshToken, nil
+}

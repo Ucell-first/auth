@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"auth/storage"
 	"auth/tokens"
 	"errors"
 	"net/http"
@@ -23,16 +24,18 @@ func NewCasbinPermission(enforcer *casbin.Enforcer) CasbinPermission {
 	return &casbinPermission{enforcer: enforcer}
 }
 
-func Check(c *gin.Context) {
-	acccesorrefresh := c.GetHeader("Authorization")
-	if acccesorrefresh == "" {
+func Check(c *gin.Context, crud storage.IStorage) {
+	accces := c.GetHeader("Authorization")
+	if accces == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Authorization is required",
 		})
 		return
 	}
 
-	_, err := tokens.ValidateACCESToken(acccesorrefresh)
+	// bl,err:= crud.Token().VerifyToken()
+
+	_, err := tokens.ValidateACCESToken(accces)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token provided",
