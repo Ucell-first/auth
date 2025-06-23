@@ -371,7 +371,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Yangi foydalanuvchi yaratish va JWT tokenlarini qaytarish
+      description: register new user
       parameters:
       - description: Foydalanuvchi ma'lumotlari
         in: body
@@ -410,7 +410,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Foydalanuvchini ro'yxatdan o'tkazish
+      summary: register user
       tags:
       - auth
   /auth/reset-password:

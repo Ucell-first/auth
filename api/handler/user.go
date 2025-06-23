@@ -17,8 +17,8 @@ import (
 )
 
 // Register godoc
-// @Summary Foydalanuvchini ro'yxatdan o'tkazish
-// @Description Yangi foydalanuvchi yaratish va JWT tokenlarini qaytarish
+// @Summary register user
+// @Description register new user
 // @Tags auth
 // @Accept json
 // @Produce json

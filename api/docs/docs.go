@@ -323,7 +323,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Yangi foydalanuvchi yaratish va JWT tokenlarini qaytarish",
+                "description": "register new user",
                 "consumes": [
                     "application/json"
                 ],
@@ -333,7 +333,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Foydalanuvchini ro'yxatdan o'tkazish",
+                "summary": "register user",
                 "parameters": [
                     {
                         "description": "Foydalanuvchi ma'lumotlari",
