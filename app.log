@@ -44,3 +44,10 @@ time=2025-06-23T13:51:52.182+05:00 level=INFO msg="Starting token cleanup"
 time=2025-06-23T13:51:52.188+05:00 level=INFO msg="Token cleanup completed" duration=6.075708ms duration_ms=6
 time=2025-06-23T13:51:54.208+05:00 level=INFO msg="GetUserProfile started"
 time=2025-06-23T13:51:54.209+05:00 level=ERROR msg="Unauthorized1: signature is invalid"
+time=2025-06-23T13:53:22.453+05:00 level=INFO msg="Starting token cleanup scheduler" interval=1h0m0s
+time=2025-06-23T13:53:22.453+05:00 level=INFO msg="Starting token cleanup"
+time=2025-06-23T13:53:22.460+05:00 level=INFO msg="Token cleanup completed" duration=6.908916ms duration_ms=6
+time=2025-06-23T13:53:26.133+05:00 level=INFO msg="GetUserProfile started"
+time=2025-06-23T13:53:26.136+05:00 level=INFO msg="GetUserProfile succeeded for user: admin@gmail.com"
+time=2025-06-23T13:53:34.443+05:00 level=INFO msg="UserList started"
+time=2025-06-23T13:53:34.445+05:00 level=INFO msg="UserList succeeded, 2 users returned"
